@@ -1,0 +1,19 @@
+# Node modules
+node_modules/
+
+# Environment variables file
+.env
+
+# Firebase service accounts (if you have them)
+firebase.json
+
+# Logs
+*.log
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Vite or other bundler caches
+.vite/
+dist/
