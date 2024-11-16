@@ -32,11 +32,41 @@ const loginUser = async (req, res) => {
     }
 };
 
-// token ID
+// Token creation function
 const createToken = (id) => {
     const secret = process.env.JWT_SECRET;
-    console.log("Creating token with secret:", secret);  // Debug line 6
-    return jwt.sign({ id }, secret);
+    const expiresIn = "1h"; // Token expires in 1 hour
+    return jwt.sign({ id }, secret, { expiresIn });
+};
+
+// Google Login Function
+const googleLogin = async (req, res) => {
+    const { uid, name, email } = req.body;
+
+    try {
+        // Check if the user already exists in the database
+        let user = await userModel.findOne({ email });
+
+        if (!user) {
+            // Create a new user if not found
+            user = new userModel({
+                uid,
+                name,
+                email,
+                password: null, // Google users don't have passwords
+            });
+
+            await user.save();
+        }
+
+        // Create a JWT token for the user
+        const token = createToken(user._id);
+
+        res.status(200).json({ success: true, token });
+    } catch (error) {
+        console.error("Error during Google login:", error);
+        res.status(500).json({ success: false, message: "An internal server error occurred." });
+    }
 };
 
 const registerUser = async (req, res) => {
@@ -81,4 +111,4 @@ const registerUser = async (req, res) => {
     }
 };
 
-export { loginUser, registerUser };
+export { loginUser, registerUser, googleLogin };
